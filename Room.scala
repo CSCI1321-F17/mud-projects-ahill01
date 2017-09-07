@@ -1,8 +1,8 @@
 package MUD
 
-class Room (val name:String, val desc: String, private var _Items: List[Item], private var Exits: Array[Int]) {
+class Room (val name:String, val desc: String, private var _Items: List[Item], private var _Exits: Array[Int]) {
  
-    val Exit = Exits
+    val Exit = _Exits
    
    val ItemsList = _Items
   
@@ -23,6 +23,7 @@ class Room (val name:String, val desc: String, private var _Items: List[Item], p
   */
     def getExit(dir:Int): Option[Int] = {???}
   
+    
     /**
      * Pull an item from the room if it is there and return it.
      * @param item name
@@ -31,6 +32,7 @@ class Room (val name:String, val desc: String, private var _Items: List[Item], p
   def getItem(itemName:String): Boolean = {
     val index = ItemsList.indexOf("itemName") 
    if (ItemsList.contains(itemName)) {
+     _Items(index)
      _Items.updated(index,Nil)
      true} else {
        println("This item is not in your inventory")
