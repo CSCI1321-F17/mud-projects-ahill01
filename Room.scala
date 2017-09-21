@@ -1,6 +1,6 @@
 package MUD
 
-class Room (val name:String, val desc: String, private var _Items: List[Item], private var _Exits: Array[Int]) {
+class Room (val name:String, val desc: String, private var _Items: List[Item], private var _Exits: Array[String]) {
  
     val Exit = _Exits
    
@@ -11,8 +11,8 @@ class Room (val name:String, val desc: String, private var _Items: List[Item], p
    * @param Array[String]
    * @return String for printing
    */
-  def description(d:Array[String]): String = {
-     ??? 
+  def description(): String = {
+     name+"\n" + desc 
     } 
 
   
@@ -26,17 +26,18 @@ class Room (val name:String, val desc: String, private var _Items: List[Item], p
     
     /**
      * Pull an item from the room if it is there and return it.
-     * @param item name
+     * @param name of item
      * @return boolean, true if item is removed from inventory false if not
      */
-  def getItem(itemName:String): Boolean = {
-    val index = ItemsList.indexOf("itemName") 
-   if (ItemsList.contains(itemName)) {
-     _Items(index)
-     _Items.updated(index,Nil)
-     true} else {
-       println("This item is not in your inventory")
-       false} 
+  def getItem(itemName:String): Option[Item] = {
+    ItemsList.find(_.name==itemName) match {
+      case Some(item) => 
+        val indexNil = ItemsList.indexOf(Nil)
+    if (ItemsList.contains(Nil)) { _Items.updated(indexNil,item)}
+        Some(item)
+      case None => None
+    
+    }
     }
 
 /**
@@ -45,10 +46,7 @@ class Room (val name:String, val desc: String, private var _Items: List[Item], p
  * @return Unit
  */
   def dropItem(item:Item): Unit = {
-    val indexNil = ItemsList.indexOf(Nil)
-    if (ItemsList.contains(Nil)) {
-      _Items.updated(indexNil,item) 
-      } else (_Items :+ item)
+    _Items = _Items :+ item
   }
 }
 /**
@@ -61,15 +59,15 @@ object Room {
    */
   val rooms = readRoomsFromFile()
   
-  
   /**
    * Reads in the text file with the map.
-   * @return The array of rooms from the file.
+   * @return The Map of room name => Room
    */
-  def readRoomsFromFile():Array[Room] = {
+  def readRoomsFromFile():Map[String, Room] = {
     val source = io.Source.fromFile("Map.txt")
     val lines = source.getLines()
-    val r = Array.fill(lines.next.toInt)(readRoom(lines))
+    val numberRooms = lines.next
+    val r = Map(lines.next -> readRoom(lines))
     source.close
     r
   }
@@ -86,8 +84,9 @@ object Room {
       val itm = lines.next.split(";")
      new Item(itm(0), itm(1))
     }
-    val exits = lines.next().split(" ").map(_.toInt) 
+    val exits = lines.next().split(", *").padTo(6, "") 
     new Room (name, desc, items, exits)
+    
   }
   
 }
