@@ -1,5 +1,8 @@
-package MUD
+package mud
 import io.StdIn._
+import mud.Room
+import mud.Item
+
 class Player(private var inventory: List[Item], private var blueDot: Room) {
   import Room._
   /**
