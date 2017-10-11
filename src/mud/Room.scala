@@ -1,11 +1,30 @@
 package mud
 import mud.Item
+import akka.actor.Actor
+import akka.actor.Props
+import akka.actor.ActorRef
 
-class Room(val name: String, val desc: String, private var _Items: List[Item], private var _Exits: Map[String, Room]) {
-
-  val Exit = _Exits
-
+class Room(val keyword: String, val name: String, val desc: String, private var _Items: List[Item], private var _exitNames: Array[String]) extends Actor {
+  println("Made room: " + name)
+  val exitNames = _exitNames
   val ItemsList = _Items
+  private var exits: Array[Option[ActorRef]] = Array.empty
+  
+  import Room._
+  
+  def receive = {
+    case LinkExits(rooms) =>
+      exits = exitNames.map(rooms.get)
+    case GetItem(itemName) =>
+    // Call your code to handle this and send something back to the sender/player
+      //if have item, send message to print "got item!" -> else "that item isn't here"
+    case DropItem(item)    =>
+    // Call you code to handle this.
+      Player.getfromInventory(item)
+      Player.bluedot.dropItem(item)
+    case m =>
+      println("Oops! Bad message to room: " + m)
+  }
 
   /**
    * Build a String with the description of the room for printing.
@@ -19,9 +38,9 @@ class Room(val name: String, val desc: String, private var _Items: List[Item], p
   /**
    * Return exit information for a direction if there is an exit in that direction.
    * @param:
-   * @return Option[Int]
+   * @return Option[Room]
    */
-  def getExit(dir: Int): Option[Int] = { ??? }
+  def getExit(dir: String): Option[Room] = { ??? }
 
   /**
    * Pull an item from the room if it is there and return it.
@@ -53,39 +72,24 @@ class Room(val name: String, val desc: String, private var _Items: List[Item], p
  * doing the I/O.
  */
 object Room {
+  case class LinkExits(rooms: Map[String, ActorRef])
+  case class GetItem(itemName: String)
+  case class DropItem(item: Item)
+  
+ 
+ 
   /**
-   * This is the array of rooms for the game map.
-   */
-  val rooms = readRoomsFromFile()
-
-  /**
-   * Reads in the text file with the map.
+   * @param xml Node
+   * Reads in the xml file with the map.
    * @return The Map of room name => Room
    */
-  def readRoomsFromFile(): Map[String, Room] = {
-    val source = io.Source.fromFile("Map.txt")
-    val lines = source.getLines()
-    val numberRooms = lines.next
-    val r = Map(lines.next -> readRoom(lines))
-    source.close
-    r
-  }
-
-  /**
-   * Reads a single room from an iterator of strings.
-   * @param lines The iterator to read the data from.
-   * @return A single room pulled from that iterator.
-   */
-  def readRoom(lines: Iterator[String]): Room = {
-    val name = lines.next()
-    val desc = lines.next()
-    val items = List.fill(lines.next.toInt) {
-      val itm = lines.next.split(";")
-      new Item(itm(0), itm(1))
-    }
-    val exits = lines.next().split(", *").padTo(6, "")
-    new Room(name, desc, items, exits)
-
+  def apply(n: xml.Node): (String, () => Room) = {
+    val keyword = (n \ "@keyword").text.trim
+    val name = (n \ "@name").text.trim
+    val desc = (n \ "@description").text.trim
+    val items = (n \ "item").map(Item.apply).toList
+    val exits = (n \ "connections").text.split(",").map(_.trim)
+    (keyword, () => new Room(keyword, name, desc, items, exits))
   }
 
 }

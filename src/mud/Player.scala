@@ -2,9 +2,14 @@ package mud
 import io.StdIn._
 import mud.Room
 import mud.Item
-
-class Player(private var inventory: List[Item], private var blueDot: Room) {
-  import Room._
+import akka.actor.Actor
+import akka.actor.Props
+import akka.actor.ActorRef
+import Room._
+  
+class Player(private var inventory: List[Item], private var blueDot: Room) extends Actor {
+//input stream
+  if (have stuff to process) processCommand
   /**
    * parses and processes command provided by user
    * possible commands = get item from inventory, add item to inventory, list valid commands, move, look, and quit
@@ -124,5 +129,5 @@ class Player(private var inventory: List[Item], private var blueDot: Room) {
  *
  */
 object Player {
-
+// to user Output
 }

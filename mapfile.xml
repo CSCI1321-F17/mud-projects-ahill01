@@ -1,26 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Library> 
-<MainFloor name = "Library Main Floor" > 
+<Room keyword = "MainFloor" name = "Library Main Floor" > 
 <Item name = "1001 Jokes for Nerds" description = "A battered looking book full of puns that only a nerd would find funny" />
-<connections> 
-<north></north>
-<south></south>
-<east></east>
-<west></west> 
-<up>CoffeeShop</up>
-<down> </down>
+<connections>,,,,CoffeeShop,,
 </connections>
-</MainFloor>
-<CoffeeShop name = "Coffee Shop" > 
+</Room>
+<Room keyword ="CoffeeShop" name = "Coffee Shop" > 
 <Item name = "coffee" description = "A warm, caffeinated beverage that might help you finish your computer science homework on time." />
 <Item name = "muffin" description = "A chocolate pastry stuffed with chocolate chips that is distinguishable from a cupcake only in the sense that it does not have frosting on it." />
-<connections> 
-<north></north>
-<south></south>
-<east></east>
-<west></west> 
-<up></up>
-<down>MainFloor</down>
+<connections>,,,,,MainFloor,
 </connections>
-</CoffeeShop>
+</Room>
 </Library>
