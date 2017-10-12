@@ -3,6 +3,8 @@ import mud.Item
 import akka.actor.Actor
 import akka.actor.Props
 import akka.actor.ActorRef
+import RoomManager._
+import Player._
 
 class Room(val keyword: String, val name: String, val desc: String, private var _Items: List[Item], private var _exitNames: Array[String]) extends Actor {
   println("Made room: " + name)

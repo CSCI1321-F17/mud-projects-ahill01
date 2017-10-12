@@ -4,6 +4,7 @@ import io.StdIn._
 import mud.Room
 import mud.Player
 import RoomManager._
+
 object Main {
   def main(args:Array[String]):Unit = {
    println("Hello, welcome to The Library. Available commands: get, add, list, move, look, quit, help.")

@@ -6,10 +6,20 @@ import akka.actor.Actor
 import akka.actor.Props
 import akka.actor.ActorRef
 import Room._
-  
+
 class Player(private var inventory: List[Item], private var blueDot: Room) extends Actor {
-//input stream
-  if (have stuff to process) processCommand
+  val input = Console.in
+  var stuffToRead = false
+  if (input == null) {
+    stuffToRead
+  } else {
+    stuffToRead = true
+    stuffToRead
+  }
+  //input stream
+  if (stuffToRead = true) {
+    processCommand(input)
+  }
   /**
    * parses and processes command provided by user
    * possible commands = get item from inventory, add item to inventory, list valid commands, move, look, and quit
@@ -24,35 +34,30 @@ class Player(private var inventory: List[Item], private var blueDot: Room) exten
     }
     if (command.contains("add")) {
       val command1 = command.stripPrefix("add ")
-     blueDot.ItemsList.find(_.name==command1) match {
+      blueDot.ItemsList.find(_.name == command1) match {
         case Some(item) => addToInventory(item)
-        case None => println("That item is not in this room")
+        case None       => println("That item is not in this room")
       }
-       
+
     }
     if (command.contains("list")) {
       println(inventoryListing(inventory))
     }
-   
+
     if (command.contains("north")) {
       move("north")
-      }
-    else if (command.contains("south")) {
+    } else if (command.contains("south")) {
       move("south")
-      }
-    else if (command.contains("east")) {
-    move("east")  
-    }
-    else if (command.contains("west")) {
-    move("west")
-    }
-    else if (command.contains("up")) {
+    } else if (command.contains("east")) {
+      move("east")
+    } else if (command.contains("west")) {
+      move("west")
+    } else if (command.contains("up")) {
       move("up")
-    }
-    else if (command.contains("down")) {
+    } else if (command.contains("down")) {
       move("down")
     }
-      
+
     if (command.contains("look")) {
       look()
     }
@@ -99,29 +104,29 @@ class Player(private var inventory: List[Item], private var blueDot: Room) exten
    * @param string (north, south, east, west, up, down)
    * @return boolean- true if player can move, false if player cannot
    */
-  def move(dir:String): Boolean = {
-    val exitTest = rooms.getOrElse(dir,"none")
-    if(exitTest == "none") false
-     else true
+  def move(dir: String): Boolean = {
+    val exitTest = rooms.getOrElse(dir, "none")
+    if (exitTest == "none") false
+    else true
   }
   /**
    * re-prints description of room
    */
   def look(): Unit = {
-    println(blueDot.description())
-   
+    Console.out.println(blueDot.description())
+
   }
 
   /**
    * prints out options/formats for valid commands
    */
   def help(): Unit = {
-    println("Command options")
-    println("get + [item name]- gets item from your inventory")
-    println("add + [item name]- adds item to your inventory")
-    println("list- lists items currently in your inventory")
-    println("to move type north, south, east, west, up, or down")
-    println("look- reprints room description")
+    Console.out.println("Command options")
+    Console.out.println("get + [item name]- gets item from your inventory")
+    Console.out.println("add + [item name]- adds item to your inventory")
+    Console.out.println("list- lists items currently in your inventory")
+    Console.out.println("to move type north, south, east, west, up, or down")
+    Console.out.println("look- reprints room description")
   }
 }
 /**
@@ -129,5 +134,5 @@ class Player(private var inventory: List[Item], private var blueDot: Room) exten
  *
  */
 object Player {
-// to user Output
+  // to user Output
 }
