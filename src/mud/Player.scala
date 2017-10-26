@@ -170,6 +170,7 @@ class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socke
    }
    case PrintThisDesc(description) => out.println("description: " + description)
    case EnterRoom(rooms(startRoom)) => blueDot = startRoom
+   case PrintThis(something) => out.println(something)
   }
 }
 
@@ -182,4 +183,5 @@ object Player {
   case object CheckInput
   case class PrintThisDesc(description:String)
   case class EnterRoom(rooms(startRoom):ActorRef)
+  case class PrintThis(something:String)
 }
