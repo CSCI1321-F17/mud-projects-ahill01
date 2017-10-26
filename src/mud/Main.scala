@@ -16,21 +16,22 @@ object Main extends App{
    Console.out.println("Hello, welcome to The Library. Available commands: get, add, list, move, look, quit, help.")
    val pm = system.actorOf(Props(new PlayerManager), "PlayerManager")
    val rm = system.actorOf(Props(new RoomManager), "RoomManager")    
-   rm ! AddPlayerAtStart
+   
   
   val ss = new ServerSocket(12345)
   while(true) {
     import system.dispatcher
-    system.scheduler.schedule(0.seconds, 0.001.seconds, pm , PlayerManager.checkInput)
+    system.scheduler.schedule(0.seconds, 1.000.seconds, pm , PlayerManager.checkInput)
     val sock = ss.accept()
     val out = new PrintStream(sock.getOutputStream)
     out.println("What's your name?")
     val in = new BufferedReader(new InputStreamReader(sock.getInputStream))
     Future {
       val name = in.readLine()
+      pm ! PlayerManager.NewPlayer(name, out, in, sock)
+      rm ! AddPlayerAtStart
       println(name+" has arrived")
       out.println("Welcome to the Library, "+name+"!")
-      pm ! PlayerManager.NewPlayer(name, out, in, sock)
     }
   }
     
