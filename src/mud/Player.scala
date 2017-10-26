@@ -125,17 +125,7 @@ class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socke
     val listing = inventory.mkString
     listing
   }
-
-  /**
-   *
-   * @param string (north, south, east, west, up, down)
-   * @return boolean- true if player can move, false if player cannot
-   */
-  def move(dir: String): Boolean = {
-    val exitTest = RoomManager.rooms.getOrElse(dir, "none")
-    if (exitTest == "none") false
-    else true
-  }
+  
   /**
    * re-prints description of room
    */
@@ -169,7 +159,7 @@ class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socke
      case None => out.println("That item cannot be added to inventory")
    }
    case PrintThisDesc(description) => out.println("description: " + description)
-   case EnterRoom(rooms(startRoom)) => blueDot = startRoom
+   case EnterRoom(startRoom) => blueDot = startRoom
    case PrintThis(something) => out.println(something)
   }
 }
@@ -182,6 +172,6 @@ object Player {
   case class TakeItem(oitem:Option[Item])
   case object CheckInput
   case class PrintThisDesc(description:String)
-  case class EnterRoom(rooms(startRoom):ActorRef)
+  case class EnterRoom(startRoom:ActorRef)
   case class PrintThis(something:String)
 }

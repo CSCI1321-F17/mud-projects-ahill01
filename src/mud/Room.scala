@@ -22,8 +22,7 @@ class Room(val keyword: String, val name: String, val desc: String, private var 
     case LinkExits(rooms) =>
       exits = exitNames.map(rooms.get)
     case GetItem(itemName) => {
-      this.getItem(itemName)
-      sender ! TakeItem(ItemsList.find(Item.name == itemName))
+      sender ! Player.TakeItem(this.getItem(itemName))
     }
     // Call your code to handle this and send something back to the sender/player
       //if have item, send message to print "got item!" -> else "that item isn't here"

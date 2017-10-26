@@ -20,7 +20,7 @@ class RoomManager extends Actor {
   
   def receive = {
     case AddPlayerAtStart(player, startRoom) =>
-       Player ! EnterRoom(rooms(startRoom))
+       player ! Player.EnterRoom(rooms(startRoom))
     case m =>
       println("Oops! Bad message sent to RoomManager: "+m)
   }
