@@ -1,7 +1,8 @@
 package mud
 
-class Item (val name:String, val desc:String) {
-  
+class Item (val _name:String, val _desc:String) {
+  val name = _name
+  val desc = _desc
 }
 object Item {
   /**

@@ -6,9 +6,19 @@ import akka.actor.Actor
 import akka.actor.Props
 import akka.actor.ActorRef
 import Room._
+import java.io.PrintStream
+import java.net.Socket
+import java.io.BufferedReader
+import PlayerManager._
+import Main._
 
-class Player(private var inventory: List[Item], private var blueDot: Room) extends Actor {
-  val input = Console.in
+class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socket) extends Actor { 
+
+  private var inventory = List[Item]()
+  private var blueDot: ActorRef = null
+
+  import Player._
+  val input = in
   var stuffToRead = false
   if (input == null) {
     stuffToRead
@@ -17,8 +27,8 @@ class Player(private var inventory: List[Item], private var blueDot: Room) exten
     stuffToRead
   }
   //input stream
-  if (stuffToRead = true) {
-    processCommand(input)
+  if (stuffToRead == true) {
+    processCommand(input.toString)
   }
   /**
    * parses and processes command provided by user
@@ -28,34 +38,49 @@ class Player(private var inventory: List[Item], private var blueDot: Room) exten
    */
 
   def processCommand(command: String): Unit = {
+   if (command.contains("message")) {
+     val command1 = command.stripPrefix("message ")
+     pm ! PlayerManager.Message(command1)
+   }
+   if (command.contains("tell")) {
+     val command1 = command.stripPrefix("tell ")
+     val split = command1.indexOf(" ")
+     val name = command1.slice(0,split)
+     val message = command1.stripPrefix(name)
+     pm ! PlayerManager.Tell(name,message)
+   }
+    if (command.contains("drop")) {
+      val command1 = command.stripPrefix("drop ")
+      dropFromInventory(command1)
+      blueDot ! _
+    }
     if (command.contains("get")) {
       val command1 = command.stripPrefix("get ")
-      getFromInventory(command1)
-    }
-    if (command.contains("add")) {
-      val command1 = command.stripPrefix("add ")
-      blueDot.ItemsList.find(_.name == command1) match {
-        case Some(item) => addToInventory(item)
-        case None       => println("That item is not in this room")
-      }
+       blueDot! GetItem(command1) 
+       
 
     }
     if (command.contains("list")) {
-      println(inventoryListing(inventory))
+      out.println("items in your inventory: " + inventoryListing(inventory))
     }
 
     if (command.contains("north")) {
-      move("north")
+      blueDot ! Room.CheckExit("north")
+     
     } else if (command.contains("south")) {
-      move("south")
+      blueDot ! Room.CheckExit("south")
+      
     } else if (command.contains("east")) {
-      move("east")
+      blueDot ! Room.CheckExit("east")
+      
     } else if (command.contains("west")) {
-      move("west")
+     blueDot ! Room.CheckExit("west")
+     
     } else if (command.contains("up")) {
-      move("up")
+      blueDot ! Room.CheckExit("up")
+      
     } else if (command.contains("down")) {
-      move("down")
+      blueDot ! Room.CheckExit("down")
     }
 
     if (command.contains("look")) {
@@ -73,13 +98,15 @@ class Player(private var inventory: List[Item], private var blueDot: Room) exten
    * Gets item from inventory if possible and returns it
    * @return Item/true if item is in inventory, false if not
    */
-  def getFromInventory(itemName: String): Boolean = {
-    val index = inventory.indexOf("itemName")
-    if (inventory.contains(itemName)) {
-      inventory(index)
-      true
-    } else false
-
+  def dropFromInventory(itemName: String): Option[Item] = {
+     inventory.find(_.name == itemName) match {
+      case Some(item) => {
+        val indexNil = inventory.indexOf(Nil)
+        if (inventory.contains(Nil)) {inventory.updated(indexNil, item)}
+        Some(item)
+      }
+      case None => None
+    }
   }
 
   /**
@@ -105,7 +132,7 @@ class Player(private var inventory: List[Item], private var blueDot: Room) exten
    * @return boolean- true if player can move, false if player cannot
    */
   def move(dir: String): Boolean = {
-    val exitTest = rooms.getOrElse(dir, "none")
+    val exitTest = RoomManager.rooms.getOrElse(dir, "none")
     if (exitTest == "none") false
     else true
   }
@@ -113,7 +140,8 @@ class Player(private var inventory: List[Item], private var blueDot: Room) exten
    * re-prints description of room
    */
   def look(): Unit = {
-    Console.out.println(blueDot.description())
+    blueDot ! PrintDesc
+    
 
   }
 
@@ -121,18 +149,37 @@ class Player(private var inventory: List[Item], private var blueDot: Room) exten
    * prints out options/formats for valid commands
    */
   def help(): Unit = {
-    Console.out.println("Command options")
-    Console.out.println("get + [item name]- gets item from your inventory")
-    Console.out.println("add + [item name]- adds item to your inventory")
-    Console.out.println("list- lists items currently in your inventory")
-    Console.out.println("to move type north, south, east, west, up, or down")
-    Console.out.println("look- reprints room description")
+   out.println("Command options")
+   out.println("get + [item name]- gets item from your inventory")
+   out.println("add + [item name]- adds item to your inventory")
+   out.println("list- lists items currently in your inventory")
+   out.println("to move type north, south, east, west, up, or down")
+   out.println("look- reprints room description")
+  }
+  
+  def receive = {
+   case TakeExit(oroom) => oroom match {
+     case Some(room) => 
+       blueDot = room //change blueDot
+     case None =>  out.println("That is not an exit.")
+   }
+   case TakeItem(oitem) => oitem match {
+     case Some(item) => 
+       addToInventory(item)
+     case None => out.println("That item cannot be added to inventory")
+   }
+   case PrintThisDesc(description) => out.println("description: " + description)
+   case EnterRoom(rooms(startRoom)) => blueDot = startRoom
   }
 }
+
 /**
  * Companion object for class Player
- *
  */
 object Player {
-  // to user Output
+  case class TakeExit(oroom: Option[ActorRef]) // to user Output
+  case class TakeItem(oitem:Option[Item])
+  case object CheckInput
+  case class PrintThisDesc(description:String)
+  case class EnterRoom(rooms(startRoom):ActorRef)
 }
