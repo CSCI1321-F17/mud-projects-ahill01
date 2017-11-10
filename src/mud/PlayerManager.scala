@@ -20,11 +20,12 @@ class PlayerManager extends Actor {
       val lname = name.filter(_.isLetterOrDigit)
       if(context.child(lname).isEmpty) {
         context.actorOf(Props(new Player(name, out, in, sock)), lname)
+        // print commands list
       } else {
         out.println("Name alread taken.")
         sock.close()
       }
-  case m => println("Bad message sent to PlayerManager")
+  case m => println("Bad message sent to PlayerManager: " + m)
   }
 }
 
