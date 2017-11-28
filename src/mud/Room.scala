@@ -6,6 +6,7 @@ import akka.actor.ActorRef
 import RoomManager._
 import Player._
 import Item._
+import BSTMap._
 
 class Room(val keyword: String, val name: String, val desc: String, private var _Items: List[Item], private var _exitNames: Array[String]) extends Actor {
   println("Made room: " + name)
@@ -58,12 +59,12 @@ class Room(val keyword: String, val name: String, val desc: String, private var 
    */
   
  def getExit(dir: String): Option[ActorRef] = {
-      ???
+     ???
  }
   /**
    * Pull an item from the room if it is there and return it.
    * @param name of item (string)
-   * @return boolean, true if item is removed from inventory false if not
+   * @return Option[Item]
    */
   def getItem(itemName: String): Option[Item] = {
     ItemsList.find(_.name == itemName) match {
@@ -88,7 +89,7 @@ class Room(val keyword: String, val name: String, val desc: String, private var 
  * doing the I/O.
  */
 object Room {
-  case class LinkExits(rooms: Map[String, ActorRef])
+  case class LinkExits(rooms: BSTMap[String, ActorRef])
   case class GetItem(itemName: String)
   case class DropItem(item: Item)
   case class CheckExit(dir:String)

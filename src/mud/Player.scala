@@ -11,6 +11,7 @@ import java.net.Socket
 import java.io.BufferedReader
 import PlayerManager._
 import Main._
+import RoomManager._
 
 class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socket) extends Actor { 
 
@@ -92,6 +93,10 @@ class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socke
     if (command.contains("quit")) {
       println("Bye!")
     }
+    if (command.contains("shortestPath")) {
+      val index = command.indexOf(" ")
+      rm ! RoomManager.FindPath(command.substring(index))
+    }
   }
 
   /**
@@ -161,6 +166,7 @@ class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socke
    case PrintThisDesc(description) => out.println("description: " + description)
    case EnterRoom(startRoom) => blueDot = startRoom
    case PrintThis(something) => out.println(something)
+   case PrintPath(something) => 
   }
 }
 
@@ -174,4 +180,5 @@ object Player {
   case class PrintThisDesc(description:String)
   case class EnterRoom(startRoom:ActorRef)
   case class PrintThis(something:String)
+  case class PrintPath(something:Unit)
 }
