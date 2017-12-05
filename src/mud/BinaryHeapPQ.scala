@@ -5,10 +5,12 @@ import scala.reflect.ClassTag
 class BinaryHeapPQ[A : ClassTag](hp: (A, A) => Boolean) {
   private var heap = new Array[A](30)
   private var end = 1
-  
+ /*
+  * removes item from priority queue 
+  */
   def dequeue(): A = ???
   /*
-   * @param: item to add to priority queue
+   * adds item to priority queue
    * 
    */
   def enqueue(a: A): Unit = {
