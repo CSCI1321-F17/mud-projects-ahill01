@@ -11,8 +11,7 @@ import BSTMap._
 class Room(val keyword: String, val name: String, val desc: String, private var _Items: List[Item], private var _exitNames: Array[String]) extends Actor {
   println("Made room: " + name)
   val exitNames = _exitNames
-  var dirs = new Array[String](6)
-  dirs = Array("north","south","east","west","up","down")
+  
   val dirMap = Map[String,String](("north",exitNames(0)),("south",exitNames(1)),("east",exitNames(2)),("west",exitNames(3)),("up",exitNames(4)),("down",exitNames(5)))
   val ItemsList = _Items
   private var exits: Array[Option[ActorRef]] = Array.empty
@@ -22,6 +21,7 @@ class Room(val keyword: String, val name: String, val desc: String, private var 
   def receive = {
     case LinkExits(rooms) =>
       exits = exitNames.map(rooms.get)
+      sender ! RoomManager.ExitInfo(keyword,_exitNames)
     case GetItem(itemName) => {
       sender ! Player.TakeItem(this.getItem(itemName))
     }
@@ -108,6 +108,7 @@ object Room {
     val exits = (n \ "connections").text.split(",").map(_.trim)
     (keyword, () => new Room(keyword, name, desc, items, exits))
   }
+  val dirs = Array("north","south","east","west","up","down")
 
 }
   

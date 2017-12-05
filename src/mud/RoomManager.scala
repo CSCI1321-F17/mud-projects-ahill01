@@ -16,10 +16,18 @@ class RoomManager extends Actor {
   val rooms = new BSTMap[String,ActorRef](_.compare(_))
   mapData.foreach(rooms += _)
  
+  var roomExits = Map[String,Array[String]]()
+  
   context.children.foreach(_ ! Room.LinkExits(rooms))
   
-  def findPath(roomName:String):Unit = {
-    ???
+  def findPath(destination:String, current:String):List[String] = {
+    if (destination == current) List[String]("") else {
+     val paths = for((r,dir) <- roomExits(current).zip(Room.dirs); if roomExits.contains(r)) yield {
+        dir::findPath(destination,r)
+      }
+   val notEmpty = paths.filter(_.nonEmpty)
+    if(notEmpty.isEmpty) Nil else notEmpty.minBy(_.length) 
+    }
   }
   
   
@@ -28,8 +36,11 @@ class RoomManager extends Actor {
   def receive = {
     case AddPlayerAtStart(player, startRoom) =>
        player ! Player.EnterRoom(rooms(startRoom))
-    case FindPath(roomName) => {     
-      sender ! Player.PrintPath(findPath(roomName))
+    case FindPath(destination,current) => {     
+      sender ! Player.PrintPath(findPath(destination, current))
+    }
+    case ExitInfo(keyword,exitNames) => {
+      roomExits+=(keyword -> exitNames)
     }
     case m =>
       println("Oops! Bad message sent to RoomManager: "+m)
@@ -39,5 +50,6 @@ class RoomManager extends Actor {
 
 object RoomManager {
   case class AddPlayerAtStart(player: ActorRef, startRoom: String)
-  case class FindPath(roomName:String)
+  case class FindPath(destination:String, current:String)
+  case class ExitInfo(keyword:String,exitNames:Array[String])
 }

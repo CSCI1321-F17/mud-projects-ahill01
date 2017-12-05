@@ -1,17 +1,14 @@
 package mud
-import io.StdIn._
-import mud.Room
-import mud.Item
-import akka.actor.Actor
-import akka.actor.Props
-import akka.actor.ActorRef
-import Room._
+import java.io.BufferedReader
 import java.io.PrintStream
 import java.net.Socket
-import java.io.BufferedReader
-import PlayerManager._
-import Main._
-import RoomManager._
+
+import Main.pm
+import Main.rm
+import Room.GetItem
+import Room.PrintDesc
+import akka.actor.Actor
+import akka.actor.ActorRef
 
 class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socket) extends Actor { 
 
@@ -95,7 +92,7 @@ class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socke
     }
     if (command.contains("shortestPath")) {
       val index = command.indexOf(" ")
-      rm ! RoomManager.FindPath(command.substring(index))
+      rm ! RoomManager.FindPath(command.substring(index), blueDot.path.name)
     }
   }
 
