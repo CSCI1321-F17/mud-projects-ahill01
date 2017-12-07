@@ -13,28 +13,27 @@ class PlayerManager extends Actor {
  import PlayerManager._
   
   def receive = { 
-  case Message(something) => { context.children.foreach(_ ! Player.PrintThis(something))}
-  case Tell(user,something) => { context.children.foreach(_ ! Player.PrintThis(something))}
-  case checkInput: Unit => for(f <- context.children) f ! checkInput
-  case NewPlayer(name, out, in, sock) =>
+  case NewPlayer(name, out, in, sock, 10) =>
       val lname = name.filter(_.isLetterOrDigit)
       if(context.child(lname).isEmpty) {
-        context.actorOf(Props(new Player(name, out, in, sock)), lname)
-        // print commands list
+      val playerref = context.actorOf(Props(new Player(name, out, in, sock, 10)), lname)
+         Main.rm ! RoomManager.AddPlayerAtStart(playerref,"MainFloor")
       } else {
         out.println("Name alread taken.")
         sock.close()
       }
+  case Say(sender, something) => { context.children.foreach(_ ! Player.PrintThis(sender + " says " +something))}
+  case Tell(user,sender,something) => { context.children.foreach(_ ! Player.PrintThis(sender + " tells you " + something))}
+  case CheckInput => for(f <- context.children) f ! Player.CheckInput
   case m => println("Bad message sent to PlayerManager: " + m)
   }
 }
 
 object PlayerManager {
-  case object printSomething
   case object AddPlayerAtStart
-  case object checkInput
-  case class printSomething(a:String)
-  case class Message(something:String)
-  case class Tell(user:String,something:String)
-  case class NewPlayer(name:String, out:PrintStream, in:BufferedReader, sock:Socket)
+  case object CheckInput
+  case class PrintSomething(a:String)
+  case class Say(sender:String, something:String)
+  case class Tell(user:String,sender:String, something:String)
+  case class NewPlayer(name:String, out:PrintStream, in:BufferedReader, sock:Socket, hp:Int)
 }

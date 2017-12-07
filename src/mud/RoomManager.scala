@@ -37,7 +37,7 @@ class RoomManager extends Actor {
     case AddPlayerAtStart(player, startRoom) =>
        player ! Player.EnterRoom(rooms(startRoom))
     case FindPath(destination,current) => {     
-      sender ! Player.PrintPath(findPath(destination, current))
+      sender ! Player.PrintPath(FindPath(destination, current))
     }
     case ExitInfo(keyword,exitNames) => {
       roomExits+=(keyword -> exitNames)

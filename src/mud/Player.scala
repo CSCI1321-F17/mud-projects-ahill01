@@ -10,7 +10,7 @@ import Room.PrintDesc
 import akka.actor.Actor
 import akka.actor.ActorRef
 
-class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socket) extends Actor { 
+class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socket, private var hp:Int) extends Actor { 
 
   private var inventory = List[Item]()
   private var blueDot: ActorRef = null
@@ -36,16 +36,16 @@ class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socke
    */
 
   def processCommand(command: String): Unit = {
-   if (command.contains("message")) {
-     val command1 = command.stripPrefix("message ")
-     pm ! PlayerManager.Message(command1)
+   if (command.contains("say")) {
+     val command1 = command.stripPrefix("say ")
+     pm ! PlayerManager.Say(this.name, command1)
    }
    if (command.contains("tell")) {
      val command1 = command.stripPrefix("tell ")
      val split = command1.indexOf(" ")
      val name = command1.slice(0,split)
      val message = command1.stripPrefix(name)
-     pm ! PlayerManager.Tell(name,message)
+     pm ! PlayerManager.Tell(name,this.name,message)
    }
     if (command.contains("drop")) {
       val command1 = command.stripPrefix("drop ")
@@ -94,6 +94,24 @@ class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socke
       val index = command.indexOf(" ")
       rm ! RoomManager.FindPath(command.substring(index), blueDot.path.name)
     }
+    //:TODO equip
+    if(command.contains("equip")) {
+     //equips item
+      ???
+    }
+    
+//:TODO unequip
+    if(command.contains("unequip")) {
+      //unequips item
+      ???
+    }
+//:TODO kill
+if(command.contains("kill")) {
+      //send mesg to activity manager 
+      // new Activity(kill, this, ActorRef for person bein killed
+       
+  ???
+    }
   }
 
   /**
@@ -133,7 +151,6 @@ class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socke
    */
   def look(): Unit = {
     blueDot ! PrintDesc
-    
 
   }
 
@@ -147,6 +164,10 @@ class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socke
    out.println("list- lists items currently in your inventory")
    out.println("to move type north, south, east, west, up, or down")
    out.println("look- reprints room description")
+   out.println("shortestPath + [room name]- returns shortest path from current room to the requested room")
+   out.println("eqiuip + [item name]- equips item to be used as a weapon")
+   out.println("unequip + [item name]- returns item to your inventory")
+   out.println("kill + [user name]- initiates combat with another user")
   }
   
   def receive = {
@@ -163,7 +184,9 @@ class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socke
    case PrintThisDesc(description) => out.println("description: " + description)
    case EnterRoom(startRoom) => blueDot = startRoom
    case PrintThis(something) => out.println(something)
-   case PrintPath(something) => 
+   case PrintPath(something) => ???
+   case Die => ???
+   case CheckInput => if(in.ready) processCommand(in.readLine)
   }
 }
 
@@ -178,4 +201,5 @@ object Player {
   case class EnterRoom(startRoom:ActorRef)
   case class PrintThis(something:String)
   case class PrintPath(something:Unit)
+  case object Die
 }

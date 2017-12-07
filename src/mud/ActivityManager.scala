@@ -1,4 +1,5 @@
 package mud
+//:TODO Activity Manager
 import akka.actor.Actor
 
 class ActivityManager extends Actor {

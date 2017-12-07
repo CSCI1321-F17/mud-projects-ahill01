@@ -7,13 +7,16 @@ import RoomManager._
 import Player._
 import Item._
 import BSTMap._
+import NPC._
 
-class Room(val keyword: String, val name: String, val desc: String, private var _Items: List[Item], private var _exitNames: Array[String]) extends Actor {
+
+class Room(val keyword: String, val name: String, val desc: String, private var _Items: List[Item], private var NPCs:Seq[NPC], private var _exitNames: Array[String]) extends Actor {
   println("Made room: " + name)
   val exitNames = _exitNames
-  
   val dirMap = Map[String,String](("north",exitNames(0)),("south",exitNames(1)),("east",exitNames(2)),("west",exitNames(3)),("up",exitNames(4)),("down",exitNames(5)))
   val ItemsList = _Items
+  val NPCsList = NPCs
+  
   private var exits: Array[Option[ActorRef]] = Array.empty
   
   import Room._
@@ -49,7 +52,7 @@ class Room(val keyword: String, val name: String, val desc: String, private var 
    * @return String for printing
    */
   def description(): String = {
-    name + "\n" + desc
+    name + "\n" + desc + "Items: " + ItemsList.toString + "People: " + NPCsList
   }
 
   /**
@@ -57,7 +60,7 @@ class Room(val keyword: String, val name: String, val desc: String, private var 
    * @param:
    * @return Option[Room]
    */
-  
+  //:TODO Get Exit
  def getExit(dir: String): Option[ActorRef] = {
      ???
  }
@@ -95,6 +98,7 @@ object Room {
   case class CheckExit(dir:String)
   case object PrintDesc
  
+  //:TODO add in NPCS 
   /**
    * @param xml Node
    * Reads in the xml file with the map.
@@ -105,8 +109,11 @@ object Room {
     val name = (n \ "@name").text.trim
     val desc = (n \ "@description").text.trim
     val items = (n \ "item").map(Item.apply).toList
+    val npcs = (n \ "@NPC").map(NPC.apply)
     val exits = (n \ "connections").text.split(",").map(_.trim)
-    (keyword, () => new Room(keyword, name, desc, items, exits))
+     println(name + items + npcs)
+    (keyword, () => new Room(keyword, name, desc, items, npcs, exits))
+    
   }
   val dirs = Array("north","south","east","west","up","down")
 
