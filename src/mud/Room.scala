@@ -1,5 +1,4 @@
 package mud
-import mud.Item
 import akka.actor.Actor
 import akka.actor.Props
 import akka.actor.ActorRef
@@ -10,12 +9,12 @@ import BSTMap._
 import NPC._
 
 
-class Room(val keyword: String, val name: String, val desc: String, private var _Items: List[Item], private var NPCs:Seq[NPC], private var _exitNames: Array[String]) extends Actor {
+class Room(val keyword: String, val name: String, val desc: String, private var _Items: List[Item], private var _exitNames: Array[String]) extends Actor {
   println("Made room: " + name)
   val exitNames = _exitNames
   val dirMap = Map[String,String](("north",exitNames(0)),("south",exitNames(1)),("east",exitNames(2)),("west",exitNames(3)),("up",exitNames(4)),("down",exitNames(5)))
   val ItemsList = _Items
-  val NPCsList = NPCs
+  val charList = List()
   
   private var exits: Array[Option[ActorRef]] = Array.empty
   
@@ -45,24 +44,24 @@ class Room(val keyword: String, val name: String, val desc: String, private var 
       println("Oops! Bad message to room: " + m)
   }
   }
-
+//TODO List of characters
   /**
    * Build a String with the description of the room for printing.
    * @param Array[String]
    * @return String for printing
    */
   def description(): String = {
-    name + "\n" + desc + "Items: " + ItemsList.toString + "People: " + NPCsList
+    name + "\n" + desc + "Items: " + ItemsList.toString + "People: "
   }
 
   /**
    * Return exit information for a direction if there is an exit in that direction.
    * @param:
-   * @return Option[Room]
+   * @return Option[ActorRef]
    */
   //:TODO Get Exit
  def getExit(dir: String): Option[ActorRef] = {
-     ???
+   if (dirMap.isDefinedAt(dir)) exits(
  }
   /**
    * Pull an item from the room if it is there and return it.
@@ -108,14 +107,19 @@ object Room {
     val keyword = (n \ "@keyword").text.trim
     val name = (n \ "@name").text.trim
     val desc = (n \ "@description").text.trim
-    val items = (n \ "item").map(Item.apply).toList
-    val npcs = (n \ "@NPC").map(NPC.apply)
+    val items = (n \ "Item").map(Item.apply).toList
     val exits = (n \ "connections").text.split(",").map(_.trim)
-     println(name + items + npcs)
-    (keyword, () => new Room(keyword, name, desc, items, npcs, exits))
+   for (n2 <- n \ "NPC") {
+    val npcname = (n2 \ "@npcname").text.trim
+    val hp = (n2 \ "@hp").text.trim.toInt
+  val startRoom = (n2 \ "@startRoom").text.trim
+  Main.npcm ! NPCManager.NewNPC(npcname, hp, startRoom)
+   }
+   (keyword, () => new Room(keyword, name, desc, items, exits))
     
   }
   val dirs = Array("north","south","east","west","up","down")
-
+  val charList = Seq[ActorRef]()
+  
 }
   

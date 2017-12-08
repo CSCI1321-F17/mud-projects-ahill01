@@ -17,7 +17,7 @@ class PlayerManager extends Actor {
       val lname = name.filter(_.isLetterOrDigit)
       if(context.child(lname).isEmpty) {
       val playerref = context.actorOf(Props(new Player(name, out, in, sock, 10)), lname)
-         Main.rm ! RoomManager.AddPlayerAtStart(playerref,"MainFloor")
+         Main.rm ! RoomManager.AddPlayer(playerref,"MainFloor")
       } else {
         out.println("Name alread taken.")
         sock.close()

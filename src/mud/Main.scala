@@ -22,6 +22,7 @@ object Main extends App {
   Console.out.println("Hello, welcome to The Library. Available commands: get, add, list, move, look, quit, help, say, tell, equip, unequip, and kill.")
   val pm = system.actorOf(Props[PlayerManager], "PlayerManager")
   val rm = system.actorOf(Props[RoomManager], "RoomManager")
+  val npcm = system.actorOf(Props[NPCManager],"NPCManager")
   import system.dispatcher
   system.scheduler.schedule(0.1.seconds, 0.100.seconds, pm, PlayerManager.CheckInput)
 
@@ -35,8 +36,7 @@ object Main extends App {
     Future {
       val usrname = in.readLine()
       pm ! PlayerManager.NewPlayer(usrname, out, in, sock, 10)
-   
-      println(usrname + " has arrived")
+      out.println(usrname + " has arrived")
       out.println("Welcome to the Library, " + usrname + "!")
     }
   }
