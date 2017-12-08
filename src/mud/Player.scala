@@ -88,7 +88,8 @@ class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socke
       help()
     }
     if (command.contains("quit")) {
-      println("Bye!")
+      out.println("Bye!")
+      sock.close()
     }
     if (command.contains("shortestPath")) {
       val index = command.indexOf(" ")

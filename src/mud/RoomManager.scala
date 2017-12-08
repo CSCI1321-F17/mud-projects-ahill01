@@ -35,6 +35,7 @@ class RoomManager extends Actor {
   def receive = {
     case AddPlayer(player, room) =>
       player ! Player.EnterRoom(rooms(room))
+  //    Main.pm ! PlayerManager.PrintSomething(player.usrname + " has arrived")
    //   Room.charList += player
     case AddNPC(npc, room) => {
       npc ! NPC.EnterRoom(rooms(room))

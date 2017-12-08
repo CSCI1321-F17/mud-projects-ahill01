@@ -12,7 +12,7 @@ import NPC._
 class Room(val keyword: String, val name: String, val desc: String, private var _Items: List[Item], private var _exitNames: Array[String]) extends Actor {
   println("Made room: " + name)
   val exitNames = _exitNames
-  val dirMap = Map[String,String](("north",exitNames(0)),("south",exitNames(1)),("east",exitNames(2)),("west",exitNames(3)),("up",exitNames(4)),("down",exitNames(5)))
+  val dirMap = Map[String,Int](("north",0),("south",1),("east",2),("west",3),("up",4),("down",5))
   val ItemsList = _Items
   val charList = List()
   
@@ -61,7 +61,7 @@ class Room(val keyword: String, val name: String, val desc: String, private var 
    */
   //:TODO Get Exit
  def getExit(dir: String): Option[ActorRef] = {
-   if (dirMap.isDefinedAt(dir)) exits(
+   exits(dirMap(dir))
  }
   /**
    * Pull an item from the room if it is there and return it.
