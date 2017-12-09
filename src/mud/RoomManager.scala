@@ -1,12 +1,14 @@
 package mud
 
 import akka.actor.Actor
-import akka.actor.Props
 import akka.actor.ActorRef
+import akka.actor.Props
+
 
 class RoomManager extends Actor {
   println("Loading rooms")
   val xData = xml.XML.loadFile("mapfile.xml")
+ 
   private var mapData = {
     (xData \ "Room").map(n => {
       val (key, builder) = Room.apply(n)
@@ -15,15 +17,14 @@ class RoomManager extends Actor {
   }
   val rooms = new BSTMap[String, ActorRef](_.compare(_))
   mapData.foreach(rooms += _)
-
   var roomExits = Map[String, Array[String]]()
-
+  print(rooms)
   context.children.foreach(_ ! Room.LinkExits(rooms))
 
   def findPath(destination: String, current: String): List[String] = {
     if (destination == current) List[String]("") else {
       val paths = for ((r, dir) <- roomExits(current).zip(Room.dirs); if roomExits.contains(r)) yield {
-        dir :: findPath(destination, r)
+        dir :: findPath(r, destination)
       }
       val notEmpty = paths.filter(_.nonEmpty)
       if (notEmpty.isEmpty) Nil else notEmpty.minBy(_.length)
@@ -35,14 +36,16 @@ class RoomManager extends Actor {
   def receive = {
     case AddPlayer(player, room) =>
       player ! Player.EnterRoom(rooms(room))
-  //    Main.pm ! PlayerManager.PrintSomething(player.usrname + " has arrived")
-   //   Room.charList += player
+      val msg = player.path.toString.substring(player.path.toString.lastIndexOf("/")+1) + " has arrived"
+      Main.pm ! PlayerManager.PrintToRoom(msg)
+   //TODO  Room.charList += player, say "player has left
     case AddNPC(npc, room) => {
       npc ! NPC.EnterRoom(rooms(room))
-   //   Room.charList += npcref
+   //TODO   Room.charList += npcref
     }
     case FindPath(destination, current) => {
-      sender ! Player.PrintPath(FindPath(destination, current))
+      sender ! Player.PrintThis("Finding path")
+      sender ! Player.PrintPath(findPath(destination, current))
     }
 
     case ExitInfo(keyword, exitNames) => {

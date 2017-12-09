@@ -18,8 +18,13 @@ class BSTMap[K, V](comp: (K, K) => Int) extends collection.mutable.Map[K, V] {
     if(rover==null) None else Some(rover.kv._2)
   }
 
-  def iterator: Iterator[(K, V)] = ???
-
+  def iterator: Iterator[(K, V)] = {
+    if (iterator.hasNext) {
+    iterator.next
+    val remainder = iterator.drop(2)
+    remainder.take(2)
+  } else iterator
+}
   def +=(kv: (K, V)) = {
     def adder(n: Node[K, V]): Node[K, V] = {
       if (n == null) {
@@ -81,6 +86,5 @@ class BSTMap[K, V](comp: (K, K) => Int) extends collection.mutable.Map[K, V] {
 object BSTMap extends App {
   private class Node[K, V](var kv: (K, V), var left: Node[K, V], var right: Node[K, V])
 
-  val map = new BSTMap[String, ActorRef](_.compare(_))
 
 }

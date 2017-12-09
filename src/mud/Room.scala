@@ -23,7 +23,7 @@ class Room(val keyword: String, val name: String, val desc: String, private var 
   def receive = {
     case LinkExits(rooms) =>
       exits = exitNames.map(rooms.get)
-      sender ! RoomManager.ExitInfo(keyword,_exitNames)
+      sender ! RoomManager.ExitInfo(keyword,exitNames)
     case GetItem(itemName) => {
       sender ! Player.TakeItem(this.getItem(itemName))
     }
@@ -51,7 +51,7 @@ class Room(val keyword: String, val name: String, val desc: String, private var 
    * @return String for printing
    */
   def description(): String = {
-    name + "\n" + desc + "Items: " + ItemsList.toString + "People: "
+    name + "\n" + desc + "Items: " + ItemsList + "People: "
   }
 
   /**
@@ -59,7 +59,7 @@ class Room(val keyword: String, val name: String, val desc: String, private var 
    * @param:
    * @return Option[ActorRef]
    */
-  //:TODO Get Exit
+
  def getExit(dir: String): Option[ActorRef] = {
    exits(dirMap(dir))
  }
@@ -71,9 +71,10 @@ class Room(val keyword: String, val name: String, val desc: String, private var 
   def getItem(itemName: String): Option[Item] = {
     ItemsList.find(_.name == itemName) match {
       case Some(item) =>
-        val indexNil = ItemsList.indexOf(Nil)
-        if (ItemsList.contains(Nil)) { _Items.updated(indexNil, item) }
-        Some(item)
+      val ret = Some(item)
+        val index = ItemsList.indexOf(item)
+        if (ItemsList.contains(item)) { _Items.updated(index, Nil) }
+        ret
       case None => None
     }
   }
@@ -97,7 +98,6 @@ object Room {
   case class CheckExit(dir:String)
   case object PrintDesc
  
-  //:TODO add in NPCS 
   /**
    * @param xml Node
    * Reads in the xml file with the map.

@@ -109,7 +109,7 @@ class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socke
 //:TODO kill
 if(command.contains("kill")) {
       //send mesg to activity manager 
-      // new Activity(kill, this, ActorRef for person bein killed
+      // new Activity(kill, this, ActorRef for person bein killed)
        
   ???
     }
@@ -174,7 +174,8 @@ if(command.contains("kill")) {
   def receive = {
    case TakeExit(oroom) => oroom match {
      case Some(room) => 
-       blueDot = room //change blueDot
+      Main.pm ! PlayerManager.PrintSomething(this.name + " has left the room")
+       blueDot = room        
      case None =>  out.println("That is not an exit.")
    }
    case TakeItem(oitem) => oitem match {

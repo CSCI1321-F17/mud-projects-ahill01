@@ -2,8 +2,9 @@ package mud
 //:TODO add NPCs w/ random movement
 //: TODO add a linked list (mutable & sorted)
 //:TODO add combat (equip/unequip/kill/flee command processing, players/NPCs take damage)
-//:TODO priority queue (sorted linked list bsed PQ and Heap based PQ)
-//:TODO Not making list of Items & NPCs
+//:TODO priority queue (sorted linked list based PQ and Heap based PQ)
+//:TODO List of players, NPCs in room
+//TODO won't remove items from list (either inventory or room list)
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.PrintStream
@@ -19,7 +20,7 @@ import akka.actor.ActorRef
 
 object Main extends App {
   val system = ActorSystem("MUDActors")
-  Console.out.println("Hello, welcome to The Library. Available commands: get, add, list, move, look, quit, help, say, tell, equip, unequip, and kill.")
+ 
   val pm = system.actorOf(Props[PlayerManager], "PlayerManager")
   val rm = system.actorOf(Props[RoomManager], "RoomManager")
   val npcm = system.actorOf(Props[NPCManager],"NPCManager")
@@ -36,8 +37,8 @@ object Main extends App {
     Future {
       val usrname = in.readLine()
       pm ! PlayerManager.NewPlayer(usrname, out, in, sock, 10)
-      out.println(usrname + " has arrived")
-      out.println("Welcome to the Library, " + usrname + "!")
+      pm ! PlayerManager.PrintSomething(usrname + " has logged in")
+      out.println("Welcome to the Library, " + usrname + "!" + "Available commands: get, add, list, move, look, quit, help, say, tell, equip, unequip, shortestPath, and kill.")
     }
   }
 
