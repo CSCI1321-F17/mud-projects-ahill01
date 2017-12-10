@@ -175,7 +175,7 @@ if(command.contains("kill")) {
    case TakeExit(oroom) => oroom match {
      case Some(room) => 
       Main.pm ! PlayerManager.PrintSomething(this.name + " has left the room")
-       blueDot = room        
+       blueDot = room 
      case None =>  out.println("That is not an exit.")
    }
    case TakeItem(oitem) => oitem match {
@@ -184,9 +184,12 @@ if(command.contains("kill")) {
      case None => out.println("That item cannot be added to inventory")
    }
    case PrintThisDesc(description) => out.println("description: " + description)
-   case EnterRoom(startRoom) => blueDot = startRoom
+   case EnterRoom(room) => {
+     blueDot = room
+     out.print(blueDot)
+   }
    case PrintThis(something) => out.println(something)
-   case PrintPath(something) => ???
+   case PrintPath(something) => out.print(something)
    case Die => ???
    case CheckInput => if(in.ready) processCommand(in.readLine)
   }

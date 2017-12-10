@@ -23,6 +23,7 @@ class Room(val keyword: String, val name: String, val desc: String, private var 
   def receive = {
     case LinkExits(rooms) =>
       exits = exitNames.map(rooms.get)
+      print(exits)
       sender ! RoomManager.ExitInfo(keyword,exitNames)
     case GetItem(itemName) => {
       sender ! Player.TakeItem(this.getItem(itemName))

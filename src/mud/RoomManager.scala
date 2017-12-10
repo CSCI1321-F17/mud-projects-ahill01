@@ -18,26 +18,27 @@ class RoomManager extends Actor {
   val rooms = new BSTMap[String, ActorRef](_.compare(_))
   mapData.foreach(rooms += _)
   var roomExits = Map[String, Array[String]]()
-  print(rooms)
-  context.children.foreach(_ ! Room.LinkExits(rooms))
+  context.children.foreach(_ ! Room.LinkExits(rooms)); println("Linking Exits")
 
   def findPath(destination: String, current: String): List[String] = {
     if (destination == current) List[String]("") else {
       val paths = for ((r, dir) <- roomExits(current).zip(Room.dirs); if roomExits.contains(r)) yield {
-        dir :: findPath(r, destination)
-      }
+        print(dir)
+        dir.foreach(print(_))
+        dir :: findPath(destination, r)
+        }
       val notEmpty = paths.filter(_.nonEmpty)
       if (notEmpty.isEmpty) Nil else notEmpty.minBy(_.length)
+      notEmpty(1)
     }
-  }
+   }
 
   import RoomManager._
 
   def receive = {
     case AddPlayer(player, room) =>
       player ! Player.EnterRoom(rooms(room))
-      val msg = player.path.toString.substring(player.path.toString.lastIndexOf("/")+1) + " has arrived"
-      Main.pm ! PlayerManager.PrintToRoom(msg)
+      val msg = player.path.toString.substring(player.path.toString.lastIndexOf("]")+1) + " has arrived"
    //TODO  Room.charList += player, say "player has left
     case AddNPC(npc, room) => {
       npc ! NPC.EnterRoom(rooms(room))
