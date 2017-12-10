@@ -29,7 +29,6 @@ class RoomManager extends Actor {
         }
       val notEmpty = paths.filter(_.nonEmpty)
       if (notEmpty.isEmpty) Nil else notEmpty.minBy(_.length)
-      notEmpty(1)
     }
    }
 

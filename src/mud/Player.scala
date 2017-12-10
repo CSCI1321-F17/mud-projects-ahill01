@@ -9,10 +9,9 @@ import Room.GetItem
 import Room.PrintDesc
 import akka.actor.Actor
 import akka.actor.ActorRef
-
 class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socket, private var hp:Int) extends Actor { 
 
-  private var inventory = List[Item]()
+  private var inventory = new SLL[Item]()
   private var blueDot: ActorRef = null
 
   import Player._
@@ -49,8 +48,8 @@ class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socke
    }
     if (command.contains("drop")) {
       val command1 = command.stripPrefix("drop ")
-      dropFromInventory(command1)
-      blueDot ! _
+      dropFromInventory(command1) 
+//       blueDot ! Room.DropItem(dropFromInventory(command1))
     }
     if (command.contains("get")) {
       val command1 = command.stripPrefix("get ")
@@ -120,7 +119,14 @@ if(command.contains("kill")) {
    * @return Item/true if item is in inventory, false if not
    */
   def dropFromInventory(itemName: String): Option[Item] = {
-     inventory.find(_.name == itemName) match {
+  //   if(inventory.contains(_.itemName)) { 
+ //      inventory(inventory.indexOf(_.itemName))
+  //   } else None 
+     ???
+  }
+     /*
+      * match {
+     
       case Some(item) => {
         val indexNil = inventory.indexOf(Nil)
         if (inventory.contains(Nil)) {inventory.updated(indexNil, item)}
@@ -128,22 +134,24 @@ if(command.contains("kill")) {
       }
       case None => None
     }
-  }
+    * 
+    */
+  //}
 
   /**
    * Adds item to inventory
    * @return Unit
    */
 
-  def addToInventory(item: Item): Unit = { inventory = inventory :+ (item) }
+  def addToInventory(item: Item): Unit = {  inventory.add(item) }
 
   /**
    * builds a string w/ contents of inventory for printing
    * @param List[Item]
    * @return string of inventory list
    */
-  def inventoryListing(I: List[Item]): String = {
-    val listing = inventory.mkString
+  def inventoryListing(I: SLL[Item]): String = {
+    val listing = inventory.toString
     listing
   }
   
