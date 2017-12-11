@@ -92,8 +92,7 @@ class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socke
     }
     if (command.contains("shortestPath")) {
       val index = command.indexOf(" ")
-      val breadcrumb = List[String]()
-      rm ! RoomManager.FindPath(command.substring(index), blueDot.path.name,breadcrumb)
+     rm ! RoomManager.FindPath(command.substring(index+1), blueDot.path.name)
     }
     //:TODO equip
     if(command.contains("equip")) {
@@ -204,7 +203,7 @@ if(command.contains("kill")) {
      out.print(blueDot)
    }
    case PrintThis(something) => out.println(something)
-   case PrintPath(something) => out.print(something)
+   case PrintPath(something) => out.println("Path"+something)
    case Die => ???
    case CheckInput => if(in.ready) processCommand(in.readLine)
   }
@@ -220,6 +219,6 @@ object Player {
   case class PrintThisDesc(description:String)
   case class EnterRoom(startRoom:ActorRef)
   case class PrintThis(something:String)
-  case class PrintPath(something:Unit)
+  case class PrintPath(something:List[String])
   case object Die
 }

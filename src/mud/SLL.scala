@@ -4,28 +4,11 @@ import scala.reflect.ClassTag
 import scala.collection.GenTraversableOnce
 import scala.collection.LinearSeqOptimized
 import scala.collection.mutable
-
+/*
+ * Singly Linked List
+ */
 class SLL[A:ClassTag] extends MyList[A] {
- /*
-  *  private class Node(var data:A, var next:Node)
 
-  private var hd:Node = null
-  private var t1:Node = null
-  private var listlength = 0
-  
-  def +=(elem:A):SLL.this.type = {
-    if (t1 == hd) {
-      hd = new Node (elem, null)
-      t1 = hd
-    } else {
-      t1.next = new Node(elem, null)
-      t1 = t1.next
-    }
-    listlength += 1
-    this
-  }
-  def apply
-  */
  private class Node(var value: A, var next: Node)
   private var default: A = _
   private val end = new Node(default, null)

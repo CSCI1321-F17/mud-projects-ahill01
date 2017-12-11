@@ -4,11 +4,10 @@ import akka.actor.Actor
 import akka.actor.ActorRef
 import akka.actor.Props
 
-
 class RoomManager extends Actor {
   println("Loading rooms")
   val xData = xml.XML.loadFile("mapfile.xml")
- 
+
   private var mapData = {
     (xData \ "Room").map(n => {
       val (key, builder) = Room.apply(n)
@@ -20,16 +19,18 @@ class RoomManager extends Actor {
   var roomExits = Map[String, Array[String]]()
   context.children.foreach(_ ! Room.LinkExits(rooms)); println("Linking Exits")
 
-  def findPath(destination: String, current: String, breadcrumb:List[String]): List[String] = {
-      if (destination == current && !breadcrumb.contains(current)) List[String]("") else {
+  def findPath(destination: String, current: String, breadcrumb: Set[String]): List[String] = {
+    if (destination == current) List(current)
+    else if (breadcrumb.contains(current)) Nil else {
+      val newBreadcrumb = breadcrumb + current
       val paths = for ((r, dir) <- roomExits(current).zip(Room.dirs); if roomExits.contains(r)) yield {
-        breadcrumb ++ current
-        dir :: findPath(destination, r, breadcrumb)
-        }
-      val notEmpty = paths.filter(_.nonEmpty)
+        current :: dir :: findPath(destination, r, newBreadcrumb)
+      }
+      val notEmpty = paths.filter(_.length>=3)
       if (notEmpty.isEmpty) Nil else notEmpty.minBy(_.length)
-    }
-   }
+      
+      }
+  }
 
   import RoomManager._
 
@@ -37,14 +38,14 @@ class RoomManager extends Actor {
     case AddPlayer(player, room) =>
       player ! Player.EnterRoom(rooms(room))
       val msg = player.path.name + " has arrived"
-   //TODO  Room.charList += player, say "player has left
+    //TODO  Room.charList += player, say "player has left
     case AddNPC(npc, room) => {
       npc ! NPC.EnterRoom(rooms(room))
-   //TODO   Room.charList += npcref
+      //TODO   Room.charList += npcref
     }
-    case FindPath(destination, current,breadcrumb) => {
+    case FindPath(destination, current) => {
       sender ! Player.PrintThis("Finding path")
-      sender ! Player.PrintPath(findPath(destination, current, breadcrumb))
+      sender ! Player.PrintPath(findPath(destination, current, Set()))
     }
 
     case ExitInfo(keyword, exitNames) => {
@@ -58,7 +59,7 @@ class RoomManager extends Actor {
 
 object RoomManager {
   case class AddPlayer(player: ActorRef, room: String)
-  case class FindPath(destination: String, current: String,breadcrumb:List[String])
+  case class FindPath(destination: String, current: String)
   case class ExitInfo(keyword: String, exitNames: Array[String])
   case class AddNPC(npc: ActorRef, room: String)
 }
