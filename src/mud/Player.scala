@@ -48,7 +48,7 @@ class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socke
    }
     if (command.contains("drop")) {
       val command1 = command.stripPrefix("drop ")
-      dropFromInventory(command1) 
+    //  dropFromInventory(command1) 
 //       blueDot ! Room.DropItem(dropFromInventory(command1))
     }
     if (command.contains("get")) {
@@ -92,7 +92,8 @@ class Player(name:String, val out:PrintStream, val in:BufferedReader, sock:Socke
     }
     if (command.contains("shortestPath")) {
       val index = command.indexOf(" ")
-      rm ! RoomManager.FindPath(command.substring(index), blueDot.path.name)
+      val breadcrumb = List[String]()
+      rm ! RoomManager.FindPath(command.substring(index), blueDot.path.name,breadcrumb)
     }
     //:TODO equip
     if(command.contains("equip")) {
@@ -113,17 +114,23 @@ if(command.contains("kill")) {
   ???
     }
   }
-
+//TODO Drop from Inventory
   /**
    * Gets item from inventory if possible and returns it
    * @return Item/true if item is in inventory, false if not
    */
-  def dropFromInventory(itemName: String): Option[Item] = {
-  //   if(inventory.contains(_.itemName)) { 
- //      inventory(inventory.indexOf(_.itemName))
-  //   } else None 
-     ???
+ /* def dropFromInventory(itemName: String): Option[Item] = {
+   inventory.find(_.name == itemName) match {
+      case Some(item) => {
+      val itm = Some(item)
+      inventory.remove(inventory.indexOf(item))
+      itm
+      }
+      case None => None
+    }
   }
+  * 
+  */
      /*
       * match {
      

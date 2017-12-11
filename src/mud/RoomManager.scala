@@ -20,12 +20,11 @@ class RoomManager extends Actor {
   var roomExits = Map[String, Array[String]]()
   context.children.foreach(_ ! Room.LinkExits(rooms)); println("Linking Exits")
 
-  def findPath(destination: String, current: String): List[String] = {
-    if (destination == current) List[String]("") else {
+  def findPath(destination: String, current: String, breadcrumb:List[String]): List[String] = {
+      if (destination == current && !breadcrumb.contains(current)) List[String]("") else {
       val paths = for ((r, dir) <- roomExits(current).zip(Room.dirs); if roomExits.contains(r)) yield {
-        print(dir)
-        dir.foreach(print(_))
-        dir :: findPath(destination, r)
+        breadcrumb ++ current
+        dir :: findPath(destination, r, breadcrumb)
         }
       val notEmpty = paths.filter(_.nonEmpty)
       if (notEmpty.isEmpty) Nil else notEmpty.minBy(_.length)
@@ -37,15 +36,15 @@ class RoomManager extends Actor {
   def receive = {
     case AddPlayer(player, room) =>
       player ! Player.EnterRoom(rooms(room))
-      val msg = player.path.toString.substring(player.path.toString.lastIndexOf("]")+1) + " has arrived"
+      val msg = player.path.name + " has arrived"
    //TODO  Room.charList += player, say "player has left
     case AddNPC(npc, room) => {
       npc ! NPC.EnterRoom(rooms(room))
    //TODO   Room.charList += npcref
     }
-    case FindPath(destination, current) => {
+    case FindPath(destination, current,breadcrumb) => {
       sender ! Player.PrintThis("Finding path")
-      sender ! Player.PrintPath(findPath(destination, current))
+      sender ! Player.PrintPath(findPath(destination, current, breadcrumb))
     }
 
     case ExitInfo(keyword, exitNames) => {
@@ -59,7 +58,7 @@ class RoomManager extends Actor {
 
 object RoomManager {
   case class AddPlayer(player: ActorRef, room: String)
-  case class FindPath(destination: String, current: String)
+  case class FindPath(destination: String, current: String,breadcrumb:List[String])
   case class ExitInfo(keyword: String, exitNames: Array[String])
   case class AddNPC(npc: ActorRef, room: String)
 }

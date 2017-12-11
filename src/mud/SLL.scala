@@ -1,6 +1,9 @@
 package mud
 
 import scala.reflect.ClassTag
+import scala.collection.GenTraversableOnce
+import scala.collection.LinearSeqOptimized
+import scala.collection.mutable
 
 class SLL[A:ClassTag] extends MyList[A] {
  /*
@@ -86,10 +89,15 @@ class SLL[A:ClassTag] extends MyList[A] {
     index += 1
     if (rover.value == elem) index else indexOf(elem)
   }
-  def find(key:String):Option[A] = {
+  /*
+   * def find(elem:A):Option[A] = {
+ 
     var rover = end.next
-    ???  
+   for(_ <- 0 until size)rover = rover.next
+    if (rover.value == elem) rover.value else None
   }
   }
+  *   */
+}
 
  

@@ -1,10 +1,11 @@
 package mud
 //:TODO add NPCs w/ random movement
-//: TODO add a linked list (mutable & sorted)
+//: TODO asorted linked list PQ 
 //:TODO add combat (equip/unequip/kill/flee command processing, players/NPCs take damage)
 //:TODO priority queue (sorted linked list based PQ and Heap based PQ)
 //:TODO List of players, NPCs in room
 //TODO won't remove items from list (either inventory or room list)
+//TODO How to sort through linked list w/ keyword rather than item type
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.PrintStream
@@ -37,8 +38,7 @@ object Main extends App {
     Future {
       val usrname = in.readLine()
       pm ! PlayerManager.NewPlayer(usrname, out, in, sock, 10)
-      pm ! PlayerManager.PrintSomething(usrname + " has logged in")
-      out.println("Welcome to the Library, " + usrname + "!" + "Available commands: get, add, list, move, look, quit, help, say, tell, equip, unequip, shortestPath, and kill.")
+     out.println("Welcome to the Library, " + usrname + "!" + "Available commands: get, add, list, move, look, quit, help, say, tell, equip, unequip, shortestPath, and kill.")
     }
   }
 
