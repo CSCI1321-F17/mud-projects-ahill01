@@ -23,7 +23,6 @@ class PlayerManager extends Actor {
         sock.close()
       }
   case PrintSomething(a) => {context.children.foreach(_ ! Player.PrintThis(a)) }
- // case PrintToRoom(msg) => {???}
   case Say(sender, something) => { context.children.foreach(_ ! Player.PrintThis(sender + " says " +something))}
   case Tell(user,sender,something) => { context.actorSelection("akka://MUDActors/user/PlayerManager/"+user) ! Player.PrintThis(sender + " tells you " + something)}
   case CheckInput => for(f <- context.children) f ! Player.CheckInput

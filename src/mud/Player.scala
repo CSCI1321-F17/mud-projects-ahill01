@@ -158,7 +158,7 @@ class Player(name: String, val out: PrintStream, val in: BufferedReader, sock: S
       val weapon = weaponList(1)
       val victim = context.actorSelection("akka://MUDActors/user/PlayerManager/" + command1)
       val killEm = new Event(3, self, "Kill")
-      Main.am ! ActivityManager.ScheduleActivity(new Event(weapon.speed,self,(KillEm(victim,weapon))))
+      Main.am ! ActivityManager.ScheduleActivity(weapon.speed,self,(KillEm(victim,weapon)))
     }
   }
   /**

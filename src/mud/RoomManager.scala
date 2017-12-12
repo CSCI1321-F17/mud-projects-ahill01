@@ -47,16 +47,9 @@ class RoomManager extends Actor {
       case AddNPCStart(npc, room) => {
       npc ! NPC.AddNPCStart(rooms(room))
       val roomRef = rooms(room)
-      roomRef ! Room.AddNPC(npc)
+      roomRef ! Room.AddPlayer(npc)
     }
-      /*
-       * adds NPC to room
-       * tells NPC to enter room, tells room to add NPC
-       */
-    case AddNPC(npc, room) => {
-      val roomRef = rooms(room)
-      roomRef ! Room.AddNPC(npc)
-    }
+
     case FindPath(destination, current) => {
       sender ! Player.PrintThis("Finding path")
       sender ! Player.PrintPath(findPath(destination, current, Set()))

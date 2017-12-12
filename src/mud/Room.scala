@@ -35,9 +35,7 @@ class Room(val keyword: String, val name: String, val desc: String, private var 
         case None => None
       }
     }
-    case NPCCheckExit(dir) => {
-      sender ! NPC.EnterRoom(getExit(dir))
-    }
+
     case CheckExit(dir) => {
       sender ! Player.TakeExit(getExit(dir)) //get Some or None
     }
@@ -47,33 +45,17 @@ class Room(val keyword: String, val name: String, val desc: String, private var 
     }
 
     case AddPlayer(playerRef) => {
-      println(charList + "beforeAdd:" + this.name)
       val msg = playerRef.path.name + " has arrived"
       charList.foreach(e => e.value ! Player.PrintThis(msg))
       charList.add(playerRef)
-      println(charList + "afterAdd:" + this.name)
     }
 
     case RemovePlayer(playerRef) => {
-      println(charList + "beforeRemove:" + this.name)
       val index = charList.indexOf(playerRef)
-      //  println(index)
       charList.remove(index)
-      println(charList + "afterRemove:" + this.name)
       charList.foreach(e => e.value ! Player.PrintThis(playerRef.path.name + " has left the room"))
     }
-    
-    case AddNPC(npcRef) => {
-      val msg = npcRef.path.name + " has arrived"
-      charList.foreach(e => e.value ! Player.PrintThis(msg))
-      charList.add(npcRef)
-    }
-    
-     case RemoveNPC(npcRef) => {
-      val index = charList.indexOf(npcRef)
-      charList.remove(index)
-      charList.foreach(e => e.value ! Player.PrintThis(npcRef.path.name + " has left the room"))
-    }
+
   }
   //TODO List of characters
   /**
@@ -129,9 +111,7 @@ object Room {
   case object PrintDesc
   case class AddPlayer(playerRef: ActorRef)
   case class RemovePlayer(playerRef: ActorRef)
-  case class RemoveNPC(npcRef: ActorRef)
-  case class AddNPC(npcRef: ActorRef)
-  case class NPCCheckExit(dir:String)
+
   /**
    * @param xml Node
    * Reads in the xml file with the map.
