@@ -59,16 +59,18 @@ class Room(val keyword: String, val name: String, val desc: String, private var 
       println(charList + "afterRemove:" + this.name)
       charList.foreach(e => e.value ! Player.PrintThis(playerRef.path.name + " has left the room"))
     }
-    /*
-     case RemoveNPC(NPCRef) => {
-     val index = charList.indexOf(NPCRef)
+    
+    case AddNPC(npcRef) => {
+      val msg = npcRef.path.name + " has arrived"
+      charList.foreach(e => e.value ! Player.PrintThis(msg))
+      charList.add(npcRef)
+    }
+    
+     case RemoveNPC(npcRef) => {
+      val index = charList.indexOf(npcRef)
       charList.remove(index)
-      charList.foreach(e => e.value ! Player.PrintThis(NPCref.path.name + " has left the room"))
-     }
-    case m => {
-      println("Oops! Bad message to room: " + m)
-  }
-  */
+      charList.foreach(e => e.value ! Player.PrintThis(npcRef.path.name + " has left the room"))
+    }
   }
   //TODO List of characters
   /**
@@ -77,7 +79,7 @@ class Room(val keyword: String, val name: String, val desc: String, private var 
    * @return String for printing
    */
   def description(): String = {
-    name + "\n" + desc + "Items: " + itemsList.map(i => i.name).mkString(",") + "People: " + charList.toString()
+    name + "\n" + desc + "Items: " + itemsList.map(i => i.name).mkString(",") + " People: " + charList.map(c => c.path.name).toString().stripPrefix("SLL(")
   }
 
   /**
@@ -124,8 +126,8 @@ object Room {
   case object PrintDesc
   case class AddPlayer(playerRef: ActorRef)
   case class RemovePlayer(playerRef: ActorRef)
-  case class RemoveNPC(NPCRef: ActorRef)
-  case class AddNPC(NPCRef: ActorRef)
+  case class RemoveNPC(npcRef: ActorRef)
+  case class AddNPC(npcRef: ActorRef)
   /**
    * @param xml Node
    * Reads in the xml file with the map.

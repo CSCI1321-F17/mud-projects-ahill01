@@ -7,9 +7,17 @@ class ActivityManager extends Actor {
   private def hp(e1:Event,e2:Event):Boolean = {
    e1.delay < e2.delay
   }
+  var time = 0
   var activitypq = new PriorityQueue(hp)
   def receive = {
-    case CheckInput => activitypq.peek
+    case CheckActivities => {
+      val next = activitypq.peek
+    while(! activitypq.isEmpty && next.delay <= time) {
+       val doThis = activitypq.dequeue()
+   //    doThis.whoTo ! sender.(doThis.message)
+    }
+      
+    }
     case ScheduleActivity(a) => activitypq.enqueue(a)
     case m => println("something went wrong")
   }
@@ -17,5 +25,5 @@ class ActivityManager extends Actor {
 
 object ActivityManager {
   case class ScheduleActivity(activity:Event)
-  case object CheckInput
+  case object CheckActivities
 }

@@ -93,34 +93,35 @@ class Player(name: String, val out: PrintStream, val in: BufferedReader, sock: S
       val index = command.indexOf(" ")
       rm ! RoomManager.FindPath(command.substring(index + 1), blueDot.path.name)
     }
-    //:TODO equip
+    //:TODO TEst equip
     if (command.contains("equip")) {
       val command1 = command.stripPrefix("equip ")
       inventory.find(_.name == command1) match {
         case Some(item) =>
-          item.equipped = true
+           item.equipped = true
+           out.println(item.name+" has been equipped. "+item.name+" has "+item.damage.toString+" damage.")
         case None => out.println("Item could not be equipped")
       }
     }
 
-    //:TODO unequip
+    //:TODO TEst unequip
     if (command.contains("unequip")) {
       val command1 = command.stripPrefix("unequip ")
       inventory.find(_.name == command1) match {
         case Some(item) =>
           item.equipped = false
+          out.println(item.name+" has been unequipped")
         case None => out.println("Item could not be unequipped")
       }
     }
     //:TODO kill
     if (command.contains("kill")) {
-      //send mesg to activity manager 
-      // new Activity(kill, this, ActorRef for person bein killed)
-
-      ???
+      val command1 = command.stripPrefix("kill ")
+      val victim = context.actorSelection("akka://MUDActors/user/PlayerManager/" + command1)
+      val killEm = new Event(3, self, "Kill")
+      Main.am ! ActivityManager.ScheduleActivity(killEm)
     }
   }
-  //TODO Drop from Inventory
   /**
    * Gets item from inventory if possible and returns it
    * @return Item/true if item is in inventory, false if not
@@ -206,11 +207,11 @@ class Player(name: String, val out: PrintStream, val in: BufferedReader, sock: S
      */
     case EnterRoom(room) => {
       blueDot = room
-      out.print(blueDot)
     }
+    
     case PrintThis(something) => out.println(something)
     case PrintPath(something) => out.println("Path:" + something)
-    case Die => ???
+    case Kill => 
     case CheckInput => if (in.ready) processCommand(in.readLine)
   }
 }
@@ -226,5 +227,6 @@ object Player {
   case class EnterRoom(startRoom: ActorRef)
   case class PrintThis(something: String)
   case class PrintPath(something: List[String])
+  case object Kill
   case object Die
 }

@@ -28,9 +28,9 @@ object Main extends App {
   val am = system.actorOf(Props[ActivityManager],"ActivityManager")
   import system.dispatcher
   system.scheduler.schedule(0.1.seconds, 0.100.seconds, pm, PlayerManager.CheckInput)
-  system.scheduler.schedule(0.1.seconds, 0.100.seconds, am, ActivityManager.CheckInput)
+  system.scheduler.schedule(0.1.seconds, 0.100.seconds, am, ActivityManager.CheckActivities)
 
-  val ss = new ServerSocket(4380)
+  val ss = new ServerSocket(4499)
   while (true) {
     val sock = ss.accept()
     val out = new PrintStream(sock.getOutputStream)

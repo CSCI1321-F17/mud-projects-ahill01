@@ -35,14 +35,23 @@ class RoomManager extends Actor {
   import RoomManager._
 
   def receive = {
+    /*
+     * adds player to room
+     * tells player to enter room, tells room to add player
+     */
     case AddPlayer(player, room) =>
       player ! Player.EnterRoom(rooms(room))
       val roomRef = rooms(room)
       roomRef ! Room.AddPlayer(player)
-    //TODO  Room.charList += player, say "player has left
+      
+      /*
+       * adds NPC to room
+       * tells NPC to enter room, tells room to add NPC
+       */
     case AddNPC(npc, room) => {
       npc ! NPC.EnterRoom(rooms(room))
-      //TODO   Room.charList += npcref
+      val roomRef = rooms(room)
+      roomRef ! Room.AddNPC(npc)
     }
     case FindPath(destination, current) => {
       sender ! Player.PrintThis("Finding path")

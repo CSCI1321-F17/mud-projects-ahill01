@@ -9,17 +9,21 @@ import akka.actor.AbstractActor.ActorContext
 
 class NPC(val name: String, private var hp: Int, val startRoom:String) extends Actor {
  import NPC._
-  
-  
+def walk = new Event(3,self,"walk")
   private var blueDot: ActorRef = null
   def receive = {
-    case EnterRoom(room) => blueDot = room
+    case EnterRoom(room) => {
+      blueDot = room
+      Main.am ! ActivityManager.ScheduleActivity(walk)
+    }
+    case PrintThis(m) => 
     case m => println("Oops! Bad message to NPC: " + m)
   }
 }
 
 object NPC {
   case class EnterRoom(room:ActorRef)
+  case class PrintThis(m:String)
   
   def apply(n: xml.Node): NPC = {
     val npcname = (n \ "@name").text.trim

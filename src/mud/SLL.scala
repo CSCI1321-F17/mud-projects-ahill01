@@ -54,14 +54,6 @@ class SLL[A: ClassTag] extends MyList[A] {
     end.next = new Node(a, end.next)
   }
 
-  def map[B: ClassTag](f: A => B): SLL[B] = {
-    val ret = new SLL[B]()
-    var rover = end.next
-    while (rover != end) {
-      ret.add(f(rover.value))
-    }
-    ret
-  }
   def contains(elem: A): Boolean = {
     var rover = end.next
     for (_ <- 0 until size) rover = rover.next
@@ -93,12 +85,25 @@ class SLL[A: ClassTag] extends MyList[A] {
      var rover = end.next
     while (rover != end) {
       for (_ <- 0 until size) {
-        rtrn+=rover.value+","
+        rtrn+=rover.value+", "
         rover = rover.next
       }
     }
     rtrn + ")"
   }
+
+ def map[B:ClassTag](f: (A) => B):SLL[B] = {
+    val newList = new SLL[B] 
+    var rover = end.next
+    while (rover != end) {
+      for (_ <- 0 until size) {
+        newList.add(f(rover.value))
+        rover = rover.next
+      }
+    }
+    newList
+  }
+
  /*   
   * def find(elem:A):Option[A] = {
  
