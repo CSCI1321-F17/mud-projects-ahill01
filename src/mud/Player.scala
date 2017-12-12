@@ -9,6 +9,8 @@ import Room.GetItem
 import Room.PrintDesc
 import akka.actor.Actor
 import akka.actor.ActorRef
+import akka.actor.ActorSelection
+
 class Player(name: String, val out: PrintStream, val in: BufferedReader, sock: Socket, private var hp: Int) extends Actor {
 
   private var inventory = List[Item]()
@@ -35,10 +37,16 @@ class Player(name: String, val out: PrintStream, val in: BufferedReader, sock: S
    */
 
   def processCommand(command: String): Unit = {
+    /*
+     * say
+     */
     if (command.contains("say")) {
       val command1 = command.stripPrefix("say ")
       pm ! PlayerManager.Say(this.name, command1)
     }
+    /*
+     * Tell
+     */
     if (command.contains("tell")) {
       val command1 = command.stripPrefix("tell ")
       val split = command1.indexOf(" ")
@@ -46,20 +54,31 @@ class Player(name: String, val out: PrintStream, val in: BufferedReader, sock: S
       val message = command1.stripPrefix(name)
       pm ! PlayerManager.Tell(name, this.name, message)
     }
+    /*
+     * drop item
+     */
     if (command.contains("drop")) {
       val command1 = command.stripPrefix("drop ")
       val dItem = this.dropFromInventory(command1)
       blueDot ! Room.DropItem(this.dropFromInventory(command1))
     }
+    /*
+     * get item
+     */
     if (command.contains("get")) {
       val command1 = command.stripPrefix("get ")
       blueDot ! GetItem(command1)
 
     }
+    /*
+     * list inventory
+     */
     if (command.contains("list")) {
       out.println("items in your inventory: " + inventoryListing(inventory))
     }
-
+    /*
+ * Move
+ */
     if (command.contains("north")) {
       blueDot ! Room.CheckExit("north")
 
@@ -78,48 +97,68 @@ class Player(name: String, val out: PrintStream, val in: BufferedReader, sock: S
     } else if (command.contains("down")) {
       blueDot ! Room.CheckExit("down")
     }
-
+    /*
+ * look
+ */
     if (command.contains("look")) {
       look()
     }
+    /*
+     * help
+     */
     if (command == "help") {
       help()
     }
+    /*
+     * quit
+     */
     if (command.contains("quit")) {
       out.println("Bye!")
       sock.close()
     }
+    /*
+     * shortest Path
+     */
     if (command.contains("shortestPath")) {
       val index = command.indexOf(" ")
       rm ! RoomManager.FindPath(command.substring(index + 1), blueDot.path.name)
     }
-    //:TODO TEst equip
+    /*
+     * COMBAT STUFF
+     */
+    /*
+     * equip
+     */
     if (command.contains("equip")) {
       val command1 = command.stripPrefix("equip ")
       inventory.find(_.name == command1) match {
         case Some(item) =>
-           item.equipped = true
-           out.println(item.name+" has been equipped. "+item.name+" has "+item.damage.toString+" damage.")
+          item.equipped = true
+          out.println(item.name + " has been equipped. " + item.name + " has " + item.damage.toString + " damage.")
         case None => out.println("Item could not be equipped")
       }
     }
 
-    //:TODO TEst unequip
+    /*
+  * unequip
+  */
     if (command.contains("unequip")) {
       val command1 = command.stripPrefix("unequip ")
       inventory.find(_.name == command1) match {
         case Some(item) =>
           item.equipped = false
-          out.println(item.name+" has been unequipped")
+          out.println(item.name + " has been unequipped")
         case None => out.println("Item could not be unequipped")
       }
     }
     //:TODO kill
     if (command.contains("kill")) {
       val command1 = command.stripPrefix("kill ")
+      val weaponList = inventory.filter(i => i.equipped)
+      val weapon = weaponList(1)
       val victim = context.actorSelection("akka://MUDActors/user/PlayerManager/" + command1)
       val killEm = new Event(3, self, "Kill")
-      Main.am ! ActivityManager.ScheduleActivity(killEm)
+      Main.am ! ActivityManager.ScheduleActivity(new Event(weapon.speed,self,(KillEm(victim,weapon))))
     }
   }
   /**
@@ -139,6 +178,7 @@ class Player(name: String, val out: PrintStream, val in: BufferedReader, sock: S
 
   /*
    * Adds item to inventory
+   * @param item
    * @return Unit
    */
 
@@ -208,10 +248,10 @@ class Player(name: String, val out: PrintStream, val in: BufferedReader, sock: S
     case EnterRoom(room) => {
       blueDot = room
     }
-    
+
     case PrintThis(something) => out.println(something)
     case PrintPath(something) => out.println("Path:" + something)
-    case Kill => 
+    case KillEm(victim, weapon) => out.println("got a Kill msg back")
     case CheckInput => if (in.ready) processCommand(in.readLine)
   }
 }
@@ -227,6 +267,6 @@ object Player {
   case class EnterRoom(startRoom: ActorRef)
   case class PrintThis(something: String)
   case class PrintPath(something: List[String])
-  case object Kill
+  case class KillEm(victim:ActorSelection,weapon:Item)
   case object Die
 }

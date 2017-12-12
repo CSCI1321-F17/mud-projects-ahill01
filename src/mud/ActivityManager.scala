@@ -14,7 +14,8 @@ class ActivityManager extends Actor {
       val next = activitypq.peek
     while(! activitypq.isEmpty && next.delay <= time) {
        val doThis = activitypq.dequeue()
-   //    doThis.whoTo ! sender.(doThis.message)
+        doThis.whoTo ! doThis.message
+       time += 1
     }
       
     }

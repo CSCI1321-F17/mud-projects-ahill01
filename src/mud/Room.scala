@@ -35,6 +35,9 @@ class Room(val keyword: String, val name: String, val desc: String, private var 
         case None => None
       }
     }
+    case NPCCheckExit(dir) => {
+      sender ! NPC.EnterRoom(getExit(dir))
+    }
     case CheckExit(dir) => {
       sender ! Player.TakeExit(getExit(dir)) //get Some or None
     }
@@ -128,6 +131,7 @@ object Room {
   case class RemovePlayer(playerRef: ActorRef)
   case class RemoveNPC(npcRef: ActorRef)
   case class AddNPC(npcRef: ActorRef)
+  case class NPCCheckExit(dir:String)
   /**
    * @param xml Node
    * Reads in the xml file with the map.

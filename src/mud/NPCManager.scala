@@ -10,7 +10,7 @@ class NPCManager extends Actor {
   def receive = {
     case NewNPC(npcname, hp, startRoom) => {
       val npcref = context.actorOf(Props(new NPC(npcname, hp, startRoom)), npcname)
-      Main.rm ! RoomManager.AddNPC(npcref, startRoom)
+      Main.rm ! RoomManager.AddNPCStart(npcref, startRoom)
          }
   }
 }
