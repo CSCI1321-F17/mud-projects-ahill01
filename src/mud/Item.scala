@@ -3,6 +3,7 @@ package mud
 class Item (val _name:String, val _desc:String, val damage:Int, val speed:Int) {
   val name = _name
   val desc = _desc
+  var equipped = false
 }
 object Item {
   /**

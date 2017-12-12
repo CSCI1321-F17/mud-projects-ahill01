@@ -4,7 +4,10 @@ import akka.actor.Actor
 
 class ActivityManager extends Actor {
   import ActivityManager._
-  var activitypq = new PriorityQueue(???)
+  private def hp(e1:Event,e2:Event):Boolean = {
+   e1.delay < e2.delay
+  }
+  var activitypq = new PriorityQueue(hp)
   def receive = {
     case CheckInput => activitypq.peek
     case ScheduleActivity(a) => activitypq.enqueue(a)
@@ -13,6 +16,6 @@ class ActivityManager extends Actor {
 }
 
 object ActivityManager {
-  case class ScheduleActivity(activity:String)
+  case class ScheduleActivity(activity:Event)
   case object CheckInput
 }

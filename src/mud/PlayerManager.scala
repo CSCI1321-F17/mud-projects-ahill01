@@ -35,7 +35,6 @@ object PlayerManager {
   case object AddPlayerAtStart
   case object CheckInput
   case class PrintSomething(a:String)
-  //case class PrintToRoom(msg: String) //TODO print things to ppl in room only
   case class Say(sender:String, something:String)
   case class Tell(user:String,sender:String, something:String)
   case class NewPlayer(name:String, out:PrintStream, in:BufferedReader, sock:Socket, hp:Int)

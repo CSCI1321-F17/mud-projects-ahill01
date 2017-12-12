@@ -25,8 +25,10 @@ object Main extends App {
   val pm = system.actorOf(Props[PlayerManager], "PlayerManager")
   val rm = system.actorOf(Props[RoomManager], "RoomManager")
   val npcm = system.actorOf(Props[NPCManager],"NPCManager")
+  val am = system.actorOf(Props[ActivityManager],"ActivityManager")
   import system.dispatcher
   system.scheduler.schedule(0.1.seconds, 0.100.seconds, pm, PlayerManager.CheckInput)
+  system.scheduler.schedule(0.1.seconds, 0.100.seconds, am, ActivityManager.CheckInput)
 
   val ss = new ServerSocket(4380)
   while (true) {
